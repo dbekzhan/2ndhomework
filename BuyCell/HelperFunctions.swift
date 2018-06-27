@@ -23,14 +23,9 @@ func didAgree(toQuestion question: String) -> Bool {
     if inp.hasPrefix("y") { return true } else { return false }
 }
 
+//extension Dictionary where Value : Equatable {
+//    func returnKey(forValue val: Value) -> Key? {
+//        return first(where: { $1 == val })?.key
+//    }
+//}
 
-enum Payment: String {
-    case cash, card, bitcoin
-    static let cases = [cash, card, bitcoin]
-}
-
-extension Dictionary where Value : Equatable {
-    func returnKey(forValue val: Value) -> Key? {
-        return first(where: { $1 == val })?.key
-    }
-}

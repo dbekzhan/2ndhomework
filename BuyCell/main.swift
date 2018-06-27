@@ -11,7 +11,11 @@ import Foundation
 // Shop instance
 var shop = Shop()
 shop.balance = [ "cash" : 500, "card" : 400, "bitcoin" : 5]
-shop.items = [ "apple" : 2, "pineapple" : 3, "potato" : 5]
+shop.items = [
+    Good(name: "apple", price: 20) : 2,
+    Good(name: "pineapple", price: 30) : 3,
+    Good(name: "tomato", price: 10) : 5
+            ]
 // Bank instance
 let bank = Bank()
 
@@ -21,6 +25,10 @@ print("Welcome to the shop. What's your name?")
 let name = getln()
 // Client instance
 var client = Client(name: name)
+
+// Setting delegates
+shop.delegate = client.cart
+client.cart.delegate = shop
 
 // Set balance
 for payMethod in Payment.cases {
@@ -72,18 +80,31 @@ while true {
                 let inp = getln()
                 shop.removeItem(named: inp, completionHandler: { (success) in
                     if success {
+                        print("success")
                         client.cart.addItem(named: inp)
                     }
                 })
             }
         }
     case "ch":
-        bank.executeTransfer(from: client, to: shop)
+        let capacity = bank.canPay(giver: client, currency: currentPayMethod!)
+        switch capacity {
+        case .success:
+            bank.executeTransaction(from: &client, to: &shop)
+            client.balance.forEach({ (key, balance) in
+                print("Now you have \(balance) in \(key)")
+            })
+            shop.balance.forEach({ (key, balance) in
+                print("Now we have \(balance) in \(key)")
+            })
+            
+            client.cart.items.removeAll()
+        case .failure(let message):
+            print(message)
+        }
     default:
         continue
     }
 }
-
-
 
 
